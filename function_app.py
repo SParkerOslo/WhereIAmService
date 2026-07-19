@@ -1,4 +1,4 @@
- 
+
 import azure.functions as func
 import logging
 import json
