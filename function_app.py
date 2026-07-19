@@ -1,4 +1,3 @@
-Better:
  
 import azure.functions as func
 import logging
@@ -6,7 +5,7 @@ import json
 import urllib.request
 import urllib.error
  
-app = func.FunctionApp()
+app = func.WhereIAmLookup()
  
 @app.route(route="geolookup", auth_level=func.AuthLevel.FUNCTION)
 def geolookup(req: func.HttpRequest) -> func.HttpResponse:
