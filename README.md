@@ -7,3 +7,7 @@ location info for that address.
 
 
 Status end-point:  https://wiafunc-ezdphsfxarecfhhk.northeurope-01.azurewebsites.net/admin/host/status
+
+Lookup:         https://wiafunc-ezdphsfxarecfhhk.northeurope-01.azurewebsites.net/api/geolookup
+
+App key required, from Azure Portal Function, under default.
