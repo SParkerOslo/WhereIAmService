@@ -69,7 +69,6 @@ jobs:
           rm release.zip
         
       - name: Login to Azure
-        uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F6A82A2EDBF146AAAC98B5995D145253 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_E400E703790C45FA93E12FAA9F237164 }}
