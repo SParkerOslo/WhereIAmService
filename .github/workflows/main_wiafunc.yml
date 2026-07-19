@@ -68,12 +68,6 @@ jobs:
           unzip release.zip
           rm release.zip
         
-      - name: Login to Azure
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F6A82A2EDBF146AAAC98B5995D145253 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_E400E703790C45FA93E12FAA9F237164 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E1B73D5D9DAD4A279B3B52707EDCC6DF }}
-
       - name: 'Deploy to Azure Functions'
         uses: Azure/functions-action@v1
         id: deploy-to-function
