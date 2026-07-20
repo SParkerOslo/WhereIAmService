@@ -48,7 +48,7 @@ def geolookup(req: func.HttpRequest) -> func.HttpResponse:
 
 
 def lookup_ip(ip: str) -> dict | None:
-    """Query ip-api.com for lat/long, city, region, country."""
+    """Query pro.ip-api.com for lat/long, city, region, country."""
     # 'fields' param limits the response to just what we want (also slightly faster)
     fields = "status,message,country,regionName,city,lat,lon,query"
     url = f"https://pro.ip-api.com{ip}?fields={fields}&key={secret_value}"
@@ -58,11 +58,11 @@ def lookup_ip(ip: str) -> dict | None:
         with urllib.request.urlopen(url, timeout=5) as response:
             data = json.loads(response.read().decode())
     except (urllib.error.URLError, TimeoutError) as e:
-        logging.error(f"ip-api.com request failed: {e}")
+        logging.error(f"pro.ip-api.com request failed: {e}")
         return None
 
     if data.get("status") != "success":
-        logging.warning(f"ip-api.com lookup failed: {data.get('message')}")
+        logging.warning(f"ip-api.com lookup failed: {url} {data.get('message')}")
         return None
 
     return {
