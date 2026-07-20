@@ -58,7 +58,7 @@ def lookup_ip(ip: str) -> dict | None:
         with urllib.request.urlopen(url, timeout=5) as response:
             data = json.loads(response.read().decode())
     except (urllib.error.URLError, TimeoutError) as e:
-        logging.error(f"pro.ip-api.com request failed: {e}")
+        logging.error(f"pro.ip-api.com request failed: {e} url={url}")
         return None
 
     if data.get("status") != "success":
