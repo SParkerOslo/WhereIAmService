@@ -51,7 +51,7 @@ def lookup_ip(ip: str) -> dict | None:
     """Query pro.ip-api.com for lat/long, city, region, country."""
     # 'fields' param limits the response to just what we want (also slightly faster)
     fields = "status,message,country,regionName,city,lat,lon,query"
-    url = f"https://pro.ip-api.com{ip}/json?fields={fields}&key={secret_value}"
+    url = f"https://pro.ip-api.com/json?fields={fields}&key={secret_value}/{ip}"
 
 
     try:
