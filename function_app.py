@@ -5,6 +5,14 @@ import json
 import urllib.request
 import urllib.error
 
+import os
+
+secret_value = os.environ.get("APITOKEN")
+
+if secret_value:
+    masked_preview = secret_value[:3] 
+    logging.info(f"Secret fetched successfully! Preview: {masked_preview}...")
+
 app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
 
