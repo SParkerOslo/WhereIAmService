@@ -73,7 +73,14 @@ def lookup_ip(ip: str) -> tuple[dict | None, str | None]:
     request = urllib.request.Request(
         url,
         data=payload,
-        headers={"Content-Type": "application/json"},
+        headers={
+            "Content-Type": "application/json",
+            # pro.ip-api.com (or a WAF in front of it) appears to reject the
+            # default "Python-urllib/x.y" User-Agent with a bare 403, even
+            # though the same request succeeds via curl. Send a normal-looking
+            # UA to avoid being classified as bot traffic.
+            "User-Agent": "WhereIAmService/1.0 (+azure-function)",
+        },
         method="POST",
     )
 
