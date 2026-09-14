@@ -57,22 +57,38 @@ def geolookup(req: func.HttpRequest) -> func.HttpResponse:
 
 
 def lookup_ip(ip: str) -> tuple[dict | None, str | None]:
-    """Query pro.ip-api.com for lat/long, city, region, country.
+    """Query pro.ip-api.com's batch endpoint for lat/long, city, region, country.
 
     Returns (data, error_detail): on success, (dict, None); on failure,
     (None, <reason string>) so callers can report why without re-deriving it.
     """
-    # 'fields' param limits the response to just what we want (also slightly faster)
-    fields = "status,message,country,regionName,city,lat,lon,query"
-    url = f"https://pro.ip-api.com/json/{ip}?fields={fields}&key={secret_value}"
-
+    # Bitmask of response fields for the batch endpoint's "flags" selector
+    # (the batch equivalent of the single-lookup "fields" query param).
+    # status(1) + message(2) + country(16) + regionName(128) + city(256)
+    # + lat(2048) + lon(4096) + query(16777216) = everything this function
+    # reads below, plus "message" for the error-detail diagnostics.
+    flags = "16783763"
+    url = f"https://pro.ip-api.com/batch?key={secret_value}"
+    payload = json.dumps([{"query": ip, "flags": flags}]).encode()
+    request = urllib.request.Request(
+        url,
+        data=payload,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
 
     try:
-        with urllib.request.urlopen(url, timeout=5) as response:
-            data = json.loads(response.read().decode())
+        with urllib.request.urlopen(request, timeout=5) as response:
+            results = json.loads(response.read().decode())
     except (urllib.error.URLError, TimeoutError) as e:
-        logging.error(f"pro.ip-api.com request failed: {e} url={url}")
+        logging.error(f"pro.ip-api.com batch request failed: {e} url={url}")
         return None, f"request failed: {e}"
+
+    if not results:
+        logging.warning(f"ip-api.com batch returned no results: {url}")
+        return None, "ip-api.com returned no results"
+
+    data = results[0]
 
     if data.get("status") != "success":
         message = data.get("message")
