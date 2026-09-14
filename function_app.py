@@ -23,8 +23,14 @@ def geolookup(req: func.HttpRequest) -> func.HttpResponse:
     xff = req.headers.get('X-Forwarded-For')
     if xff:
         client_ip = xff.split(',')[0].strip()
-        if ':' in client_ip and client_ip.count(':') == 1:
+        if client_ip.startswith('['):
+            # IPv6 in bracket notation, with or without a port:
+            # "[addr]" or "[addr]:port" - strip to just the address.
+            client_ip = client_ip[1:client_ip.index(']')]
+        elif client_ip.count(':') == 1:
+            # IPv4 with a port: "1.2.3.4:12345"
             client_ip = client_ip.split(':')[0]
+        # else: bare IPv6 address with no brackets/port - use as-is
     else:
         client_ip = req.headers.get('X-Client-IP') or 'unknown'
 
