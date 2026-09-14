@@ -79,7 +79,7 @@ def lookup_ip(ip: str) -> tuple[dict | None, str | None]:
             # default "Python-urllib/x.y" User-Agent with a bare 403, even
             # though the same request succeeds via curl. Send a normal-looking
             # UA to avoid being classified as bot traffic.
-            "User-Agent": "WhereIAmService/1.0 (+azure-function)",
+            "User-Agent": "curl/8.7.1",
         },
         method="POST",
     )
