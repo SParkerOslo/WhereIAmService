@@ -37,11 +37,14 @@ def geolookup(req: func.HttpRequest) -> func.HttpResponse:
     if client_ip == 'unknown':
         return func.HttpResponse("Could not determine client IP", status_code=400)
 
-    geo_data = lookup_ip(client_ip)
+    geo_data, error_detail = lookup_ip(client_ip)
 
     if geo_data is None:
+        # error_detail carries pro.ip-api.com's own message (or the request
+        # exception) so failures are diagnosable from the client without
+        # having to go dig through Azure's function logs.
         return func.HttpResponse(
-            json.dumps({"error": "Geolocation lookup failed", "ip": client_ip}),
+            json.dumps({"error": "Geolocation lookup failed", "ip": client_ip, "detail": error_detail}),
             status_code=502,
             mimetype="application/json"
         )
@@ -53,8 +56,12 @@ def geolookup(req: func.HttpRequest) -> func.HttpResponse:
     )
 
 
-def lookup_ip(ip: str) -> dict | None:
-    """Query pro.ip-api.com for lat/long, city, region, country."""
+def lookup_ip(ip: str) -> tuple[dict | None, str | None]:
+    """Query pro.ip-api.com for lat/long, city, region, country.
+
+    Returns (data, error_detail): on success, (dict, None); on failure,
+    (None, <reason string>) so callers can report why without re-deriving it.
+    """
     # 'fields' param limits the response to just what we want (also slightly faster)
     fields = "status,message,country,regionName,city,lat,lon,query"
     url = f"https://pro.ip-api.com/json/{ip}?fields={fields}&key={secret_value}"
@@ -65,11 +72,12 @@ def lookup_ip(ip: str) -> dict | None:
             data = json.loads(response.read().decode())
     except (urllib.error.URLError, TimeoutError) as e:
         logging.error(f"pro.ip-api.com request failed: {e} url={url}")
-        return None
+        return None, f"request failed: {e}"
 
     if data.get("status") != "success":
-        logging.warning(f"ip-api.com lookup failed: {url} {data.get('message')}")
-        return None
+        message = data.get("message")
+        logging.warning(f"ip-api.com lookup failed: {url} {message}")
+        return None, message or "ip-api.com returned a non-success status with no message"
 
     return {
         "ip": data.get("query"),
@@ -78,4 +86,4 @@ def lookup_ip(ip: str) -> dict | None:
         "country": data.get("country"),
         "lat": data.get("lat"),
         "lon": data.get("lon"),
-    }
+    }, None
