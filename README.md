@@ -11,3 +11,5 @@ Status end-point:  https://wiafunc-ezdphsfxarecfhhk.northeurope-01.azurewebsites
 Lookup:         https://wiafunc-ezdphsfxarecfhhk.northeurope-01.azurewebsites.net/api/geolookup
 
 App key required, from Azure Portal Function, under default.
+
+X-Functions-Key: <key value for default>
