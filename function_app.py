@@ -70,6 +70,7 @@ def lookup_ip(ip: str) -> tuple[dict | None, str | None]:
     flags = "16783763"
     url = f"https://pro.ip-api.com/batch?key={secret_value}"
     payload = json.dumps([{"query": ip, "flags": flags}]).encode()
+    logging.warning(f"url is {url} json payload {payload}")
     request = urllib.request.Request(
         url,
         data=payload,
